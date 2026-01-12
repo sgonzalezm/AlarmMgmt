@@ -1,0 +1,14 @@
+{
+    "telegram_token": "",
+    "telegram_chat_id": "",
+    "alarm_duration": 60,
+    "deactivation_code": "1234",
+    "night_mode": false,
+    "email_notifications": false,
+    "email_address": "",
+    "apn_settings": {
+        "apn": "",
+        "username": "",
+        "password": ""
+    }
+}
