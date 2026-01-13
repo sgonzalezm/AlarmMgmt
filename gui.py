@@ -315,6 +315,11 @@ class AlarmSystemGUI(tk.Tk):
             ("2024-01-12", "09:15:10", "System Armed", "System", "Info"),
             ("2024-01-11", "22:45:33", "Window Closed", "Window Sensor", "Normal"),
         ]
+
+        module_list = ["Test module 1", "Test module 2", "Test module 3"]
+        for i in module_list:
+            module_list = self.nucleo_alarma.get_all_modules()
+            logging.info(f"Module: {i}")
         
         for item in sample_data:
             self.tree_events.insert("", tk.END, values=item)
@@ -382,9 +387,9 @@ Features:
 - Sensor monitoring
 - Alarm control
 - Event logging
-- User management
-        
-© 2024 Alarm System Company"""
+- Module management
+
+© 2026 Integral Electrica"""
         messagebox.showinfo("About", about_text)
     
     def test_alarm(self):
@@ -456,8 +461,100 @@ Features:
         messagebox.showinfo("Sensor History", f"History for {sensor_name}")
     
     def add_new_sensor(self):
-        logging.info("Add new sensor button clicked.")
-        messagebox.showinfo("Add Sensor", "Functionality to add a new sensor is not yet implemented.")
+        top_sensor = tk.Toplevel(self)
+        top_sensor.title("Add New Sensor")
+        top_sensor.geometry("350x350")
+        top_sensor.resizable(False, False)
+        top_sensor.transient(self)  # Mantenerla sobre la ventana principal
+        top_sensor.grab_set()  # Modal
+
+        top_sensor.update_idletasks()
+        x = self.winfo_x() + (self.winfo_width() // 2) - (top_sensor.winfo_width() // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (top_sensor.winfo_height() // 2)
+        top_sensor.geometry(f"+{x}+{y}")
+
+        # Frame principal con padding
+        main_frame = tk.Frame(top_sensor, padx=20, pady=20)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+         # Título
+        tk.Label(main_frame, text="Add New sensor", font=("Arial", 14, "bold")).pack(pady=(0, 20))
+        # Campos de entrada
+        fields_frame1 = tk.Frame(main_frame)
+        fields_frame1.pack(fill=tk.X, pady=10)
+
+        # Sensor name
+        tk.Label(fields_frame1, text="Sensor name:", anchor="w").grid(row=0, column=0, sticky="w", pady=5)
+        entry_sensor_name = tk.Entry(fields_frame1, width=25)
+        entry_sensor_name.grid(row=0, column=1, padx=10, pady=5)
+
+        # Role (usando Combobox en lugar de Entry)
+        tk.Label(fields_frame1, text="Role:", anchor="w").grid(row=2, column=0, sticky="w", pady=5)
+        type_var = tk.StringVar()
+        type_combo = ttk.Combobox(fields_frame1, textvariable=type_var, width=23, state="readonly")
+        type_combo['values'] = ("Motion", "Switch", "Smoke")
+        type_combo.current(1)  # Por defecto "Switch"
+        type_combo.grid(row=2, column=1, padx=10, pady=5)
+
+        # Frame para botones
+        button_frame1 = tk.Frame(main_frame)
+        button_frame1.pack(fill=tk.X, pady=20)
+
+        # Función para guardar sensor
+        def save_sensor():
+            sensor_name = entry_sensor_name.get().strip()
+            sensor_type = type_var.get()
+            
+            if not sensor_name:
+                messagebox.showerror("Error", "Sensor name is required!")
+                return
+            
+            try:
+                # Llamar al método del núcleo para insertar sensor
+                self.nucleo_alarma.register_module(sensor_name, initial_status='inactive')
+                logging.info(f"Sensor '{sensor_name}' added successfully.")
+                messagebox.showinfo("Success", f"Sensor '{sensor_name}' added successfully!")
+                top_sensor.destroy()
+            except Exception as e:
+                logging.error(f"Error adding sensor: {e}")
+                messagebox.showerror("Error", f"Failed to add sensor: {str(e)}")
+                messagebox.showerror("Error", "Username and password are required!")
+                return
+        
+        # Botón de guardar
+        btn_save1 = tk.Button(
+            button_frame1, 
+            text="Save sensor", 
+            command=save_sensor,
+            bg="#4CAF50",  # Verde
+            fg="white",
+            width=15,
+            height=2
+        )
+        btn_save1.pack(side=tk.RIGHT, padx=5)
+        
+        # Botón de cancelar
+        btn_cancel1 = tk.Button(
+            button_frame1, 
+            text="Cancel", 
+            command=top_sensor.destroy,
+            bg="#f44336",  # Rojo
+            fg="white",
+            width=15,
+            height=2
+        )
+        btn_cancel1.pack(side=tk.RIGHT, padx=5)
+        
+        # Configurar grid
+        fields_frame1.columnconfigure(1, weight=1)
+        
+        # Poner foco en el primer campo
+        entry_sensor_name.focus_set()
+        
+        # Bind Enter para guardar
+        top_sensor.bind('<Return>', lambda e: save_sensor())
+        
+        # Bind Escape para cancelar
+        top_sensor.bind('<Escape>', lambda e: top_sensor.destroy())
 
     def add_user(self):
         # 1. Crear la ventana emergente

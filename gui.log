@@ -24,3 +24,37 @@
 2026-01-11 23:25:07,806 - root - INFO - Database initialized successfully.
 2026-01-11 23:27:44,256 - root - INFO - User 'mak' created with role 'user'.
 2026-01-11 23:27:44,256 - root - INFO - User 'mak' added successfully.
+2026-01-12 21:38:41,384 - root - INFO - Database initialized successfully.
+2026-01-12 21:51:37,206 - root - INFO - Application closing.
+2026-01-12 21:51:40,380 - root - INFO - Database initialized successfully.
+2026-01-12 21:52:04,634 - root - INFO - User 'norma' created with role 'admin'.
+2026-01-12 21:52:04,635 - root - INFO - User 'norma' added successfully.
+2026-01-12 21:53:07,055 - root - INFO - Application closing.
+2026-01-12 21:56:49,692 - root - INFO - Database initialized successfully.
+2026-01-12 21:57:05,874 - root - ERROR - Error adding sensor: 'AlarmCore' object has no attribute 'insert_sensor'
+2026-01-12 21:57:18,511 - root - INFO - Application closing.
+2026-01-12 22:52:56,169 - root - INFO - Database initialized successfully.
+2026-01-12 22:53:03,355 - root - INFO - Module 'Puerta' registered with ID 1.
+2026-01-12 22:53:03,378 - root - INFO - Sensor 'Puerta' added successfully.
+2026-01-12 22:55:07,169 - root - INFO - Alarm activated by user.
+2026-01-12 22:55:14,246 - root - INFO - Alarm deactivated by user.
+2026-01-12 22:55:22,760 - root - INFO - Alarm activated by user.
+2026-01-12 22:56:42,247 - root - INFO - Alarm deactivated by user.
+2026-01-12 22:56:45,558 - root - WARNING - Panic alarm triggered by user.
+2026-01-12 22:56:49,663 - root - WARNING - Panic alarm triggered by user.
+2026-01-12 22:56:55,543 - root - INFO - Alarm deactivated by user.
+2026-01-12 22:57:04,996 - root - INFO - Application closing.
+2026-01-12 22:57:21,384 - root - INFO - Database initialized successfully.
+2026-01-12 23:04:43,928 - root - INFO - Application closing.
+2026-01-12 23:04:44,344 - root - INFO - Database initialized successfully.
+2026-01-12 23:05:53,937 - root - INFO - Application closing.
+2026-01-12 23:05:54,328 - root - INFO - Database initialized successfully.
+2026-01-12 23:05:54,686 - root - INFO - Database initialized successfully.
+2026-01-12 23:06:56,651 - root - INFO - Database initialized successfully.
+2026-01-12 23:07:25,491 - root - INFO - Database initialized successfully.
+2026-01-12 23:07:25,507 - root - INFO - Module: Test module 3
+2026-01-12 23:07:56,663 - root - INFO - Application closing.
+2026-01-12 23:07:59,137 - root - INFO - Database initialized successfully.
+2026-01-12 23:07:59,149 - root - INFO - Module: Test module 1
+2026-01-12 23:07:59,149 - root - INFO - Module: Test module 2
+2026-01-12 23:07:59,150 - root - INFO - Module: Test module 3
