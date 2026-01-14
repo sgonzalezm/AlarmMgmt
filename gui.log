@@ -58,3 +58,32 @@
 2026-01-12 23:07:59,149 - root - INFO - Module: Test module 1
 2026-01-12 23:07:59,149 - root - INFO - Module: Test module 2
 2026-01-12 23:07:59,150 - root - INFO - Module: Test module 3
+2026-01-13 20:49:42,397 - root - INFO - Database initialized successfully.
+2026-01-13 20:49:42,489 - root - INFO - Module: Test module 1
+2026-01-13 20:49:42,489 - root - INFO - Module: Test module 2
+2026-01-13 20:49:42,490 - root - INFO - Module: Test module 3
+2026-01-13 20:49:49,290 - root - INFO - Application closing.
+2026-01-13 23:10:30,929 - root - INFO - Database initialized successfully.
+2026-01-13 23:11:57,942 - root - INFO - Application closing.
+2026-01-13 23:11:58,395 - root - INFO - Database initialized successfully.
+2026-01-13 23:19:17,391 - root - INFO - Application closing.
+2026-01-13 23:19:17,929 - root - INFO - Database initialized successfully.
+2026-01-13 23:19:39,358 - root - INFO - Module 'Ventana1' registered with ID 2.
+2026-01-13 23:19:39,361 - root - INFO - Sensor 'Ventana1' added successfully.
+2026-01-13 23:19:45,461 - root - INFO - Application closing.
+2026-01-13 23:19:45,916 - root - INFO - Database initialized successfully.
+2026-01-13 23:22:44,063 - root - INFO - Module 'Presencia1' registered with ID 3.
+2026-01-13 23:22:44,075 - root - INFO - Sensor 'Presencia1' added successfully.
+2026-01-13 23:22:59,176 - root - INFO - Application closing.
+2026-01-13 23:23:01,009 - root - INFO - Database initialized successfully.
+2026-01-13 23:23:14,871 - root - INFO - Module 'puerta2' registered with ID 4.
+2026-01-13 23:23:14,874 - root - INFO - Sensor 'puerta2' added successfully.
+2026-01-13 23:23:20,436 - root - INFO - Application closing.
+2026-01-13 23:23:22,829 - root - INFO - Database initialized successfully.
+2026-01-13 23:23:29,768 - root - INFO - Module 'ventana2' registered with ID 5.
+2026-01-13 23:23:29,771 - root - INFO - Sensor 'ventana2' added successfully.
+2026-01-13 23:23:36,260 - root - INFO - Application closing.
+2026-01-13 23:23:38,036 - root - INFO - Database initialized successfully.
+2026-01-13 23:24:13,199 - root - INFO - Alarm activated by user.
+2026-01-13 23:24:24,502 - root - INFO - Alarm deactivated by user.
+2026-01-13 23:26:16,334 - root - INFO - Application closing.

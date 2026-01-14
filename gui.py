@@ -36,12 +36,8 @@ class AlarmSystemGUI(tk.Tk):
         self.active_conn = True
         
         # Sensor states
-        self.sensor_states = {
-            "door_sensor": {"name": "Door Sensor", "state": "closed", "pin": 17},
-            "window_sensor": {"name": "Window Sensor", "state": "closed", "pin": 27},
-            "motion_sensor": {"name": "Motion Sensor", "state": "no motion", "pin": 22},
-            "smoke_detector": {"name": "Smoke Detector", "state": "normal", "pin": 5},
-        }
+        self.sensor_states = self.nucleo_alarma.get_all_modules()
+        
 
         # Config file path
         self.config_file = "alarm_config.json"
@@ -316,11 +312,7 @@ class AlarmSystemGUI(tk.Tk):
             ("2024-01-11", "22:45:33", "Window Closed", "Window Sensor", "Normal"),
         ]
 
-        module_list = ["Test module 1", "Test module 2", "Test module 3"]
-        for i in module_list:
-            module_list = self.nucleo_alarma.get_all_modules()
-            logging.info(f"Module: {i}")
-        
+          
         for item in sample_data:
             self.tree_events.insert("", tk.END, values=item)
     

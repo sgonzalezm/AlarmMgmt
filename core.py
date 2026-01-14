@@ -170,14 +170,32 @@ class AlarmCore:
             return False
     
     def get_all_modules(self):
-        """Get all registered modules."""
+        """Get all registered modules as a dictionary."""
         try:
             cursor = self.connection.cursor()
             cursor.execute('SELECT * FROM modules ORDER BY name')
-            return cursor.fetchall()
+            rows = cursor.fetchall()
+            
+            # Convertir a diccionario
+            modules_dict = {}
+            
+            # Asumiendo que la tabla tiene: id, name, type, pin, state, description, etc.
+            for row in rows:
+                module_id = row[0]  # ID del módulo
+                modules_dict[module_id] = {
+                    "id": row[0],
+                    "name": row[1],
+                    "type": row[2] if len(row) > 2 else "unknown",
+                    "pin": row[3] if len(row) > 3 else 0,
+                    "state": row[4] if len(row) > 4 else "unknown",
+                    "description": row[5] if len(row) > 5 else ""
+                }
+            
+            return modules_dict
+            
         except sqlite3.Error as e:
             logging.error(f"Failed to get modules: {e}")
-            return []
+            return {}
     
     # ===== MÉTODOS PARA ALARMAS =====
     
