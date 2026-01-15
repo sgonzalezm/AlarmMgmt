@@ -248,7 +248,7 @@ class AlarmCore:
             cursor.execute('''
                 SELECT a.*, m.name as module_name 
                 FROM alarms a
-                JOIN modules m ON a.module_id = m.id
+                JOIN modules m ON a.id = m.id
                 WHERE a.acknowledged = 0
                 ORDER BY a.timestamp DESC
             ''')

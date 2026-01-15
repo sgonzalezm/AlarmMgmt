@@ -287,14 +287,17 @@ class AlarmSystemGUI(tk.Tk):
         tk.Label(search_frame, text="Search:").pack(side=tk.LEFT)
         tk.Entry(search_frame, width=20).pack(side=tk.LEFT, padx=5)
         
-        # Treeview para mostrar eventos
-        columns = ("Date", "Time", "Event", "Sensor", "Status")
+        # AJUSTAR COLUMNAS según estructura de la BD
+        # Tu consulta SQL devuelve: a.* (todos campos de alarms) + m.name (como module_name)
+        # Campos típicos: id, module_id, description, priority, timestamp, acknowledged
+        columns = ("ID", "Fecha", "Hora", "Módulo", "Descripción", "Prioridad")
         self.tree_events = ttk.Treeview(self.frame_registry, columns=columns, show="headings", height=15)
         
         # Configurar columnas
+        col_widths = {"ID": 50, "Fecha": 100, "Hora": 80, "Módulo": 120, "Descripción": 200, "Prioridad": 80}
         for col in columns:
             self.tree_events.heading(col, text=col)
-            self.tree_events.column(col, width=120)
+            self.tree_events.column(col, width=col_widths.get(col, 120))
         
         # Scrollbar
         scrollbar = ttk.Scrollbar(self.frame_registry, orient="vertical", command=self.tree_events.yview)
@@ -304,17 +307,47 @@ class AlarmSystemGUI(tk.Tk):
         self.tree_events.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(10, 0), pady=10)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y, padx=(0, 10), pady=10)
         
-        # Datos de ejemplo
-        sample_data = [
-            ("2024-01-12", "10:30:45", "Door Opened", "Door Sensor", "Normal"),
-            ("2024-01-12", "10:31:22", "Motion Detected", "Motion Sensor", "Warning"),
-            ("2024-01-12", "09:15:10", "System Armed", "System", "Info"),
-            ("2024-01-11", "22:45:33", "Window Closed", "Window Sensor", "Normal"),
-        ]
-
-          
-        for item in sample_data:
-            self.tree_events.insert("", tk.END, values=item)
+        # OBTENER Y MOSTRAR DATOS REALES
+        try:
+            real_alarm_data = self.nucleo_alarma.get_active_alarms()
+            
+            # Limpiar datos existentes en el Treeview
+            self.tree_events.delete(*self.tree_events.get_children())
+            
+            # Insertar datos reales formateados
+            if real_alarm_data:
+                for item in real_alarm_data:
+                    # Formatear los datos según la estructura de tu BD
+                    # item[0] = id, item[5] = timestamp, item[6] = module_name, etc.
+                    # Ajusta los índices según tu estructura real
+                    
+                    # Separar fecha y hora del timestamp
+                    timestamp_str = str(item[5]) if item[5] else ""
+                    fecha = timestamp_str.split()[0] if timestamp_str else ""
+                    hora = timestamp_str.split()[1] if len(timestamp_str.split()) > 1 else ""
+                    
+                    # Crear tupla con los datos para el Treeview
+                    tree_item = (
+                        item[0],        # ID
+                        fecha,          # Fecha
+                        hora,           # Hora
+                        item[6],        # module_name (índice 6 según tu consulta)
+                        item[2],        # description (ajusta según tu BD)
+                        item[3] if len(item) > 3 else ""  # priority o status
+                    )
+                    self.tree_events.insert("", tk.END, values=tree_item)
+                
+                # Mostrar mensaje informativo
+                messagebox.showinfo(
+                    "Registro de alarmas", 
+                    f"Se cargaron {len(real_alarm_data)} alarmas activas"
+                )
+            else:
+                messagebox.showinfo("Registro de alarmas", "No hay alarmas activas")
+                
+        except Exception as e:
+            logging.error(f"Error al cargar alarmas: {e}")
+            messagebox.showerror("Error", f"No se pudieron cargar las alarmas: {e}")
     
     def create_status_bar(self):
         """Crea la barra de estado en la parte inferior de la ventana"""
