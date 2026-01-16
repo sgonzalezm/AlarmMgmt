@@ -169,6 +169,36 @@ class AlarmCore:
             logging.error(f"Failed to update module status: {e}")
             return False
     
+    def unregister_module(self, module_id):
+        """Remove a module from the system by its ID."""
+        try:
+            cursor = self.connection.cursor()
+            
+            # Primero verificamos si el módulo existe
+            cursor.execute('''
+                SELECT name FROM modules WHERE id = ?
+            ''', (module_id,))
+            
+            module = cursor.fetchone()
+            
+            if not module:
+                logging.warning(f"No module found with ID {module_id}.")
+                return False
+            
+            # Eliminamos el módulo
+            cursor.execute('''
+                DELETE FROM modules WHERE id = ?
+            ''', (module_id,))
+            
+            self.connection.commit()
+            logging.info(f"Module '{module[0]}' (ID {module_id}) has been removed.")
+            return True
+            
+        except sqlite3.Error as e:
+            logging.error(f"Failed to unregister module: {e}")
+            self.connection.rollback()
+            return False
+
     def get_all_modules(self):
         """Get all registered modules as a dictionary."""
         try:

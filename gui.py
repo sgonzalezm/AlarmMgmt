@@ -264,6 +264,13 @@ class AlarmSystemGUI(tk.Tk):
             pady=10
         )
 
+        tk.Button(grid_frame, text=" - Delete Sensor", command=self.remove_sensor).grid(
+            row=len(self.sensor_states) // 2 + 1, 
+            column=1, 
+            columnspan=2, 
+            pady=10
+        )
+
     # ========== Implementaciones de métodos faltantes ==========
     
     def create_registry_frame(self):
@@ -580,6 +587,199 @@ Features:
         
         # Bind Escape para cancelar
         top_sensor.bind('<Escape>', lambda e: top_sensor.destroy())
+
+    def remove_sensor(self):
+        """Open a dialog to remove a sensor from the system."""
+        top_remove = tk.Toplevel(self)
+        top_remove.title("Remove Sensor")
+        top_remove.geometry("400x400")
+        top_remove.resizable(False, False)
+        top_remove.transient(self)  # Mantenerla sobre la ventana principal
+        top_remove.grab_set()  # Modal
+
+        top_remove.update_idletasks()
+        x = self.winfo_x() + (self.winfo_width() // 2) - (top_remove.winfo_width() // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (top_remove.winfo_height() // 2)
+        top_remove.geometry(f"+{x}+{y}")
+
+        # Frame principal con padding
+        main_frame = tk.Frame(top_remove, padx=20, pady=20)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Título
+        tk.Label(main_frame, text="Remove Sensor", font=("Arial", 14, "bold")).pack(pady=(0, 20))
+        
+        # Frame para selección de sensor
+        selection_frame = tk.Frame(main_frame)
+        selection_frame.pack(fill=tk.X, pady=10)
+        
+        # Label y Combobox para seleccionar sensor
+        tk.Label(selection_frame, text="Select Sensor:", anchor="w").grid(row=0, column=0, sticky="w", pady=10)
+        
+        # Obtener lista de sensores activos de la base de datos
+        try:
+            cursor = self.nucleo_alarma.connection.cursor()
+            cursor.execute("SELECT id, name, status FROM modules WHERE status != 'deleted' ORDER BY name")
+            sensors = cursor.fetchall()
+            
+            if not sensors:
+                tk.Label(selection_frame, text="No sensors available", fg="red").grid(row=1, column=0, columnspan=2, pady=10)
+                btn_remove = tk.Button(
+                    main_frame, 
+                    text="Close", 
+                    command=top_remove.destroy,
+                    bg="#2196F3",
+                    fg="white",
+                    width=15,
+                    height=2
+                )
+                btn_remove.pack(pady=20)
+                return
+        except Exception as e:
+            logging.error(f"Error fetching sensors: {e}")
+            messagebox.showerror("Error", f"Failed to load sensors: {str(e)}")
+            top_remove.destroy()
+            return
+        
+        # Diccionario para mapear IDs a nombres
+        sensor_dict = {f"{sensor[1]} (ID: {sensor[0]})": sensor[0] for sensor in sensors}
+        
+        # Variable para el sensor seleccionado
+        selected_sensor = tk.StringVar()
+        sensor_combo = ttk.Combobox(selection_frame, textvariable=selected_sensor, width=30, state="readonly")
+        sensor_combo['values'] = list(sensor_dict.keys())
+        sensor_combo.grid(row=0, column=1, padx=10, pady=10)
+        sensor_combo.current(0)  # Seleccionar el primero por defecto
+        
+        # Frame para información del sensor
+        info_frame = tk.LabelFrame(main_frame, text="Sensor Information", padx=10, pady=10)
+        info_frame.pack(fill=tk.X, pady=15)
+        
+        # Labels para mostrar información
+        info_labels = {}
+        info_fields = ["ID:", "Name:", "Status:"]
+        
+        for i, field in enumerate(info_fields):
+            tk.Label(info_frame, text=field, font=("Arial", 9, "bold"), anchor="w").grid(row=i, column=0, sticky="w", pady=3)
+            info_labels[field] = tk.Label(info_frame, text="", anchor="w")
+            info_labels[field].grid(row=i, column=1, sticky="w", padx=10, pady=3)
+        
+        # Función para actualizar información cuando se selecciona un sensor
+        def update_sensor_info(event=None):
+            selected_text = selected_sensor.get()
+            if selected_text and selected_text in sensor_dict:
+                sensor_id = sensor_dict[selected_text]
+                try:
+                    cursor = self.nucleo_alarma.connection.cursor()
+                    cursor.execute("SELECT id, name, status FROM modules WHERE id = ?", (sensor_id,))
+                    sensor = cursor.fetchone()
+                    
+                    if sensor:
+                        info_labels["ID:"].config(text=sensor[0])
+                        info_labels["Name:"].config(text=sensor[1])
+                        
+                        # Mostrar estado con color
+                        status = sensor[2]
+                        color = "green" if status == "active" else "orange" if status == "inactive" else "red"
+                        info_labels["Status:"].config(text=status, fg=color)
+                except Exception as e:
+                    logging.error(f"Error fetching sensor info: {e}")
+        
+        # Llamar inicialmente para mostrar información del primer sensor
+        update_sensor_info()
+        
+        # Bind el cambio de selección
+        sensor_combo.bind("<<ComboboxSelected>>", update_sensor_info)
+        
+        # Frame para botones
+        button_frame = tk.Frame(main_frame)
+        button_frame.pack(fill=tk.X, pady=20)
+        
+        # Función para eliminar el sensor
+        def delete_sensor():
+            selected_text = selected_sensor.get()
+            if not selected_text:
+                messagebox.showwarning("Warning", "Please select a sensor to remove!")
+                return
+            
+            # Confirmación de eliminación
+            confirm = messagebox.askyesno(
+                "Confirm Removal",
+                f"Are you sure you want to remove sensor:\n'{selected_text}'?\n\nThis action cannot be undone!",
+                icon='warning'
+            )
+            
+            if not confirm:
+                return
+            
+            try:
+                sensor_id = sensor_dict[selected_text]
+                
+                # Llamar al método del núcleo para eliminar el sensor
+                success = self.nucleo_alarma.unregister_module(sensor_id)
+                
+                if success:
+                    logging.info(f"Sensor '{selected_text}' removed successfully.")
+                    messagebox.showinfo("Success", f"Sensor '{selected_text}' has been removed successfully!")
+                    
+                    # Actualizar la lista de sensores
+                    cursor = self.nucleo_alarma.connection.cursor()
+                    cursor.execute("SELECT id, name, status FROM modules WHERE status != 'deleted' ORDER BY name")
+                    sensors = cursor.fetchall()
+                    
+                    if sensors:
+                        sensor_dict.clear()
+                        sensor_dict.update({f"{sensor[1]} (ID: {sensor[0]})": sensor[0] for sensor in sensors})
+                        sensor_combo['values'] = list(sensor_dict.keys())
+                        sensor_combo.current(0)
+                        update_sensor_info()
+                    else:
+                        # Si no hay más sensores, cerrar la ventana
+                        messagebox.showinfo("Info", "All sensors have been removed.")
+                        top_remove.destroy()
+                else:
+                    messagebox.showerror("Error", f"Failed to remove sensor '{selected_text}'.")
+                    
+            except Exception as e:
+                logging.error(f"Error removing sensor: {e}")
+                messagebox.showerror("Error", f"Failed to remove sensor: {str(e)}")
+        
+        # Botón de eliminar
+        btn_remove = tk.Button(
+            button_frame, 
+            text="Remove Sensor", 
+            command=delete_sensor,
+            bg="#f44336",  # Rojo
+            fg="white",
+            width=15,
+            height=2
+        )
+        btn_remove.pack(side=tk.RIGHT, padx=5)
+        
+        # Botón de cancelar
+        btn_cancel = tk.Button(
+            button_frame, 
+            text="Cancel", 
+            command=top_remove.destroy,
+            bg="#757575",  # Gris
+            fg="white",
+            width=15,
+            height=2
+        )
+        btn_cancel.pack(side=tk.RIGHT, padx=5)
+        
+        # Configurar grid
+        selection_frame.columnconfigure(1, weight=1)
+        info_frame.columnconfigure(1, weight=1)
+        
+        # Bind Enter para eliminar
+        top_remove.bind('<Return>', lambda e: delete_sensor())
+        
+        # Bind Escape para cancelar
+        top_remove.bind('<Escape>', lambda e: top_remove.destroy())
+        
+        # Poner foco en la ventana
+        top_remove.focus_set()
 
     def add_user(self):
         # 1. Crear la ventana emergente
