@@ -260,15 +260,17 @@ class AlarmSystemGUI(tk.Tk):
         tk.Button(grid_frame, text="+ Add New Sensor", command=self.add_new_sensor).grid(
             row=len(self.sensor_states) // 2 + 1, 
             column=0, 
-            columnspan=2, 
-            pady=10
+            pady=10,
+            padx=5,
+            sticky="ew"
         )
 
         tk.Button(grid_frame, text=" - Delete Sensor", command=self.remove_sensor).grid(
             row=len(self.sensor_states) // 2 + 1, 
             column=1, 
-            columnspan=2, 
-            pady=10
+            pady=10,
+            padx=5,
+            sticky="ew"
         )
 
     # ========== Implementaciones de métodos faltantes ==========
@@ -413,15 +415,15 @@ class AlarmSystemGUI(tk.Tk):
         """Muestra información acerca del sistema"""
         about_text = """Alarm System GUI v1.0.0
         
-A complete alarm system management interface.
-        
-Features:
-- Sensor monitoring
-- Alarm control
-- Event logging
-- Module management
+        A complete alarm system management interface.
+                
+        Features:
+        - Sensor monitoring
+        - Alarm control
+        - Event logging
+        - Module management
 
-© 2026 Integral Electrica"""
+        © 2026 Integral Electrica"""
         messagebox.showinfo("About", about_text)
     
     def test_alarm(self):

@@ -2,6 +2,7 @@
 import sqlite3
 import logging
 from datetime import datetime
+from io_manager import IOManager
 
 # Configure logging
 logger = logging.getLogger("CORE")
